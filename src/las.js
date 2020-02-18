@@ -1,9 +1,9 @@
 /*jshint esversion: 6*/
 /*jslint node: true */
- "use strict";
+"use strict";
 const models = require("./models.js");
 const epsg = require("./epsg.json");
-const proj4 = require("proj4");
+const proj4 = require("proj4").default;
 const stream = require('stream');
 const util = require('util');
 const wkt_parser = require("./wkt_parser.js");
@@ -253,7 +253,6 @@ class LasStreamReader extends stream.Transform {
                 new models.PointRecord(proc_buffer.slice(start_rec,end_rec), this.header, this.point_record_options, this.projection)
             );
         }
-
         if (this.points_data_read === this.points_data_size) {
             this.emit('onFinishedReadingRecords', this.header.points.number_of_points);
         }
@@ -296,7 +295,8 @@ function computeProjection(obj, records) { //variable length records
           }
         }
         try {
-          projection.convert_to_wgs84 = new proj4(projection.wkt, projection.target_proj); //to
+          // ORIGINAL projection.convert_to_wgs84 = new proj4(projection.wkt, projection.target_proj); //to
+          projection.convert_to_wgs84 = new proj4(projection.target_proj, projection.target_proj); //to
           projection.got_projection = true;
           return projection;
         } catch(error) {
@@ -365,11 +365,11 @@ function computeProjectionWithGeoTag(obj, projection_records) {
         projection.got_projection = true;
     }
     try {
-      projection.convert_to_wgs84 = new proj4(projection.epsg_proj4, projection.target_proj); //to
+      // ORIGINAL projection.convert_to_wgs84 = new proj4(projection.epsg_proj4, projection.target_proj); //to
+      projection.convert_to_wgs84 = new proj4(projection.target_proj, projection.target_proj); //to
       projection.got_projection = true;
 
     } catch(error) {
-      console.log("error", error);
       obj.emit("log", { level : 'error', message: "error building projection: " +  JSON.stringify(projection, null, " ")});
       obj.emit("error", new Error(`error building projection ${error}`));
       return;
