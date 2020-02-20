@@ -98,18 +98,17 @@ class LasStreamReader extends stream.Transform {
         this.header_buffer = Buffer.alloc(400);
         this.header_bytes_read = 0;
         this.point_record_options.transform_latlng = true;
-        this.point_record_options.parse_full_point_record = true;
         this.is_laz = false;
         this.check_laz = false;
         this.check_classification_lookup = false;
         this.has_classification_lookup_table = false;
+        this.parse_every_x_point = 1;
         if (options) {
+          // transform_lnglat, parse_every_x_point, projection, ignore_projection
             this.point_record_options.transform_lnglat = options.transform_lnglat === false ? false : true; // raw | scaled | wgs
-            this.point_record_options.parse_full_point_record = options.parse_full_point_record || false;
-            if (options.filter) {
-                //include a filter;;
-            }
-            if (options.projection && options.projection.epsg_datum) {
+            this.parse_every_x_point = options.parse_every_x_point || 1;
+            
+            if (options.projection && options.projection.epsg_datum && !options.ignore_projection) {
                 let epsg_code = epsg[String(options.projection.epsg_datum)];
                 this.projection = {
                     epsg_datum :  options.projection.epsg_datum,
@@ -119,6 +118,10 @@ class LasStreamReader extends stream.Transform {
                 };
                 //igore VLR projection data and use this one instead.
                 this.got_projection = true;
+            }
+
+            if (options.ignore_projection) {
+              this.got_projection = true;
             }
         }
     }
@@ -246,7 +249,7 @@ class LasStreamReader extends stream.Transform {
         }
         let num_records = parseInt(proc_buffer.byteLength / rec_size);
         let records = [];
-        for (let i = 0; i < num_records; i++) {
+        for (let i = 0; i < num_records; i += this.parse_every_x_point) {
             let start_rec = i * rec_size;
             let end_rec = (i + 1) * rec_size;
             records.push(
