@@ -1,5 +1,5 @@
 {
-  "name": "LasStreamReader",
+  "name": "LasReader",
   "version": "1.0.18",
   "description": "Library to read LAS formatted lidar datafiles",
   "main": "src/las.js",
@@ -8,19 +8,19 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/johnfontaine/LasStreamReader.git"
+    "url": "git+https://github.com/nationaldronesau/las-reader.git"
   },
   "keywords": [
     "LIDAR",
     "LAS",
     "LAZ"
   ],
-  "author": "John Fontaine",
+  "author": "Thornton Mills",
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/johnfontaine/LasStreamReader/issues"
+    "url": "https://github.com/nationaldronesau/las-reader/issues"
   },
-  "homepage": "https://github.com/johnfontaine/LasStreamReader#readme",
+  "homepage": "https://github.com/nationaldronesau/las-reader#readme",
   "devDependencies": {
     "chai": "^3.5.0",
     "chai-eventemitter": "^1.1.1",
